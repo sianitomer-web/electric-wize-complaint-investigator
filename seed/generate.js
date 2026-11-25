@@ -249,7 +249,8 @@ function generate({ now = Date.now(), seed = 20261125 } = {}) {
       suspected_cause: 'Card reader software fault on K22 firmware v1.8',
       evidence: '3 tickets from 3 customers about the card reader at K22 stations',
       ruled_out: 'Billing system, card issuer', confidence: 'High', route_to: 'Software',
-      first_seen: iso(ago(49)), last_seen: iso(ago(41)), fix_check: 'Resolved',
+      // last_seen is the run that set Resolved, 7 days after the Fixed mark, so the mark is not newer than it
+      first_seen: iso(ago(49)), last_seen: iso(ago(33)), fix_check: 'Resolved',
       user_mark: 'Fixed', user_mark_date: iso(ago(40)), user_note: 'Fixed by K22 firmware v1.9, rolled out to all K22 stations.',
     },
     {

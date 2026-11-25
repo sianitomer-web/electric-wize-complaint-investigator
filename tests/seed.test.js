@@ -135,6 +135,8 @@ test('C6: Fixed and Resolved 40 days ago, original tickets 45 to 50 days old, 3 
   assert.equal(f.fix_check, 'Resolved');
   assert.ok(Math.abs(ageDays(f.user_mark_date) - 40) < 0.01);
   assert.match(f.user_note, /v1\.9/);
+  // The mark must not be newer than last_seen, or the agent would move status back from Resolved to Fixed.
+  assert.ok(Date.parse(f.last_seen) > Date.parse(f.user_mark_date));
   const old = ticketsOf(findingTickets(f));
   assert.equal(old.length, 3);
   for (const t of old) assert.ok(ageDays(t.created_at) >= 45 && ageDays(t.created_at) <= 50);
