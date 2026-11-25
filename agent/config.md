@@ -51,12 +51,13 @@ The token values are never in this repository.
 
 ## Model choice
 
-The model is the only thing that changed between the two comparison runs (effort high in both). Details in `runs/`.
+Same instructions, effort and data in both runs. One difference besides the model: Haiku's memory store held notes from run 1, and Sonnet's was empty. Details in `runs/`.
 
 | | `claude-haiku-5-5` | `claude-sonnet-5-5` |
 |---|---|---|
-| Planted cases passed | 10 of 10, in two runs | 10 of 10, in one run |
+| Planted cases | 9 pass, C4 report half only | 8 pass, C3 partial, C4 report half only |
+| Clean runs with these instructions (2 required) | 0 | 1 |
 | Cost per run | $0.06 | $0.34 |
 | A month, one run a day | about $1.8 | about $10 |
 
-**Production: `claude-haiku-5-5`.** It passes every case at a sixth of the cost. Sonnet is the fallback if a real case fails on Haiku. Sonnet ran once, so the comparison rests on one run.
+**Provisional: `claude-haiku-5-5`.** It does no worse than Sonnet at about a sixth of the cost. The choice is final only after two clean runs of each model, and after the email half of C4 is built.
