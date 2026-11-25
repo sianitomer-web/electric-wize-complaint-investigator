@@ -76,15 +76,19 @@ The user fills only the `user_` fields. The agent reads them and never writes th
 - **Related tickets:** tickets in the window that describe the same symptom. A shared factor (station model, firmware, car model, city, tariff, billing type, or a change) is not part of this definition: it is what the checks below test, so the test cannot be true by construction.
 - **Problem:** at least three related tickets from three different customers.
 - **Urgent:** one ticket about safety (heat, smoke, burning smell, shock, damaged cable) or privacy (someone sees another customer's data). One is enough.
-- **Known issue:** an `issue_key` that already has a row in Findings.
-- **`issue_key`:** symptom plus shared factor, for example `stops-early__model-K50`. The same problem always gets the same key.
+- **Known issue:** a row in Findings whose `first_seen` is on an earlier day. A row first written today is still today's problem, so a second run on the same day shows it again.
+- **`issue_key`:** symptom plus shared factor, for example `stops-early__model-K50`. With no shared factor: `no-shared-factor`, for example `does-not-start__no-shared-factor`. Before making a key, the agent looks for a row that describes the same problem and reuses its key. A key never changes once it exists.
+- **`first_seen` and `last_seen`:** the time of the first and of the latest run that handled the finding. They are run times, not ticket times. `last_seen` is updated in every run, for every row, shown or not. Ticket times belong in the evidence.
 
 ## Confidence
 
 Three checks for every suspected cause:
 
-1. **Coverage:** the shared factor appears in at least 80% of the related tickets.
-2. **Contrast:** the same factor appears in at most 40% of all sessions in the window. A factor that most sessions share explains nothing.
+1. **Coverage:** the shared factor appears in at least 80% of the related tickets. If the suspected factor is a change that applies to all stations, a ticket has it when its session started after the change and shows the recorded symptom.
+2. **Contrast:** the factor separates the affected sessions from the rest.
+   - A part of the network (a station, a station model, a firmware version, a city, a car model): it appears in at most 40% of all sessions in the window. A factor that most sessions share explains nothing.
+   - A change that applies to all stations leaves no other part to compare with, so it is compared before and after: within the window, the recorded symptom (an `end_reason`, or a `charge_count` above 1) is at least three times as frequent in the sessions after the change as in the sessions before it. A symptom that leaves no trace in the sessions fails this check.
+   - The recorded symptom alone is never the factor. It describes the problem and does not explain it.
 3. **Timing:** a recorded change that fits the cause happened before the first related ticket, and not more than 7 days before it.
 
 | Checks passed | Confidence | Result |
@@ -113,27 +117,32 @@ Three checks for every suspected cause:
 - **Urgent** section first, if any. It does not count toward the limit.
 - **Up to three problems**, by severity: safety risk, then number of customers, then confidence.
 - For each: how many customers, suspected cause, evidence, what was ruled out, confidence, which team.
-- **Also watching:** one line for each further problem.
-- **Updates:** one line for each known issue that got worse, returned or was resolved.
+- **Also watching:** one line for each further problem beyond the three. Only problems as defined above: never one or two tickets, and never a pattern in the sessions that no three customers complained about.
+- **Updates:** one line for each known issue that got worse, returned, was resolved, improved or was reopened, and one for each that waits for a decision. A returned issue is shown with its earlier cause and the fix that was made.
 - A known issue that did not change is **not** shown.
+- A rejected issue with no new evidence is **not** shown anywhere in the report.
 - If nothing qualifies: "No new problems. N tickets read."
 
 The report is shown on an Airtable Interface. The user marks findings on the same screen.
 
-**Worse** means at least 50% more related tickets in the last 7 days than in the 7 days before. **Returned** means at least three new related tickets after the issue was resolved.
+**Worse** means at least 50% more related tickets in the last 7 days than in the 7 days before. **Returned** means status Resolved, and at least three related tickets from three customers created after the Fixed mark (`user_mark_date`).
 
 ## Checking itself
 
-When the user marks a finding **Fixed** on date D:
+A mark is new when `user_mark_date` is later than the row's `last_seen`. Then the status becomes the mark.
+
+The fix check runs only while the status is Fixed or Improved. Date D is the Fixed mark:
 
 | Situation | `fix_check` |
 |---|---|
 | Fewer than 7 days since D | Too early |
 | 7 days passed, no related tickets since D | Resolved |
 | 7 days passed, fewer than in the 7 days before D | Improved |
-| 7 days passed, the same or more | Not improved: the suspected cause is reopened |
+| 7 days passed, the same or more | Not improved: status Reopened, and the suspected cause moves to what was ruled out |
 
-When the user marks **Rejected**, the agent records why (`user_note`) and does not raise the same cause again unless new evidence appears. It then says what is new. A finding with no mark for 7 days is shown once as "waiting for your decision".
+Once the status is Resolved, the fix check is over. New related tickets are tested only against the definition of **Returned**. A returned finding keeps its earlier `suspected_cause`, `confidence` and `ruled_out`, because they are its history. The new tickets are added to the evidence.
+
+When the user marks **Rejected**, the agent records why (`user_note`) and does not raise the same cause again unless new evidence appears. New evidence is a recorded change that fits, or a shared factor the rejected finding did not consider. More tickets with the same symptom are not new evidence. It then says what is new. A finding with no mark for 7 days is shown once as "waiting for your decision".
 
 ## Memory
 
@@ -244,7 +253,7 @@ The answer key is kept outside Airtable, where the agent cannot read it.
 | C9 | About 25 unrelated tickets | No finding |
 | C10 | A cause the user rejected earlier, with no new evidence | Not raised again |
 
-C5, C6, C7 and C10 need history, so the test is two runs: day 1 creates findings, marks are added, and day 2 runs on the same memory.
+C5, C6, C7 and C10 need history, so the seed script creates it: their rows are already in Findings before the first run. Every test run starts from the same state: seeded Findings, empty Runs, empty memory. A second run without a reset, with the same `as_of`, checks that nothing is duplicated and that Resolved stays Resolved.
 
 ## Seed data
 
@@ -278,7 +287,7 @@ A script creates the fictional data relative to the day it is run (see "Time"), 
 1. In one run, C1 and C2 are found with the right cause, confidence and team.
 2. C3 is reported as "Not enough evidence". No run states a shared cause for it.
 3. C4 sends an email without waiting for the agent, and is first in the next report.
-4. C5 and C10 are absent from the day 2 report. C6 and C7 appear with the right update.
+4. C5 and C10 are absent from the report. C6 and C7 appear with the right update.
 5. After C8, every record in Operations is identical to before the run.
 6. The report shows at most three problems, plus Urgent, Also watching and Updates.
 7. Every ticket ID in a finding exists in Tickets, and `affected_customers` equals the number of different customers in them.
@@ -286,7 +295,7 @@ A script creates the fictional data relative to the day it is run (see "Time"), 
 9. A write to Operations with the agent's key is refused by Airtable.
 10. No key appears in the repository, the instructions, memory or a session transcript.
 11. If a table cannot be read, the run reports it and publishes no findings.
-12. Moving `as_of` forward changes the window, with no edit to the instructions.
+12. Moving `as_of` forward changes the window, with no edit to the instructions. Test runs that are compared with each other use the same `as_of`.
 13. A run costs less than its budget, and its real cost is recorded in the repository.
 14. A request to the Make webhook without the secret is refused and saves no ticket.
 15. Expected results are never edited to make a run pass. If a rule is wrong, this file changes first, then the case, then the agent.
