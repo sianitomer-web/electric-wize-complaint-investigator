@@ -56,7 +56,7 @@ Same instructions, effort and data in both runs. The instructions had a sentence
 | | `claude-haiku-5-5` | `claude-sonnet-5-5` |
 |---|---|---|
 | Planted cases | 8 pass, C3 partial, C4 report half only | 8 pass, C3 fail, C4 report half only |
-| Clean runs with these instructions (2 required) | 0 | 1 |
+| Clean runs with the corrected instructions (2 required) | 1 (run 5), cases: 9 pass, C4 report half only | 0 |
 | Cost per run | $0.06 | $0.34 |
 | A month, one run a day | about $1.8 | about $10 |
 
