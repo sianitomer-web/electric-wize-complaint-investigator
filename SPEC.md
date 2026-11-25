@@ -194,14 +194,14 @@ DONE   The report exists, Findings and Runs are updated, memory is updated
 
 1. **Every morning at 06:30 Asia/Jerusalem** (a deployment). The report is promised by 07:00: scheduled runs can start up to 9 minutes late.
 2. **By hand**, for tests.
-3. **Fast track, not the agent:** every new ticket enters through a Make webhook. The webhook address carries a secret, and Make refuses a request that does not. Make saves it to Tickets and asks a small model one question: safety or privacy? If yes, an email goes to the Head of Customer Operations at once. If the check fails or is unsure, the email is sent too. The agent still reads the ticket the next morning, so the fast track is an addition and not a replacement.
+3. **Fast track, not the agent:** every new ticket is also sent to a Make webhook. The request carries a secret in a header, and Make refuses a request that does not. Make asks a small model one question: safety or privacy? Make does not save the ticket. In a real company the ticket is already saved by the company's own ticket system, and in this assignment the tickets are loaded by the seed script. If yes, an email goes to the Head of Customer Operations at once. If the check fails or is unsure, the email is sent too. The agent still reads the ticket the next morning, so the fast track is an addition and not a replacement.
 
 ## Guardrails
 
 | Risk | Guardrail |
 |---|---|
 | A ticket tells the agent to delete or change data | The key for company data is read-only. The write key reaches only the Findings base |
-| A stranger posts tickets to the webhook | The webhook requires a secret. A request without it is refused and saves nothing |
+| A stranger posts tickets to the webhook | The webhook requires a secret. A request without it is refused with a 403, and no check and no email follow |
 | Keys leak | Both keys are in a vault, limited to `api.airtable.com`, header only. The container sees placeholders |
 | Data sent elsewhere | Network is deny-by-default with one allowed host. No web tools, no package installs |
 | The agent damages Findings | The Runs summary lists every row written, and each report is saved as a file, so a person can see what changed and correct a row by hand. A full rebuild from the report is not promised: the report shows only part of the findings |
@@ -300,7 +300,7 @@ A script creates the fictional data relative to the day it is run (see "Time"), 
 11. If a table cannot be read, the run reports it and publishes no findings.
 12. Moving `as_of` forward changes the window, with no edit to the instructions. Test runs that are compared with each other use the same `as_of`.
 13. A run costs less than its budget, and its real cost is recorded in the repository.
-14. A request to the Make webhook without the secret is refused and saves no ticket.
+14. A request to the Make webhook without the secret, or with a wrong one, is refused with a 403, and no email is sent.
 15. Expected results are never edited to make a run pass. If a rule is wrong, this file changes first, then the case, then the agent.
 
 ## Open before building
