@@ -94,17 +94,21 @@ stateDiagram-v2
     New --> Rejected: user rejects
     New --> Fixed: user marks Fixed
     Accepted --> Fixed: user marks Fixed
-    Fixed --> Resolved: 7 days, no tickets
+    Fixed --> Resolved: 7 days, no tickets since the mark
     Fixed --> Improved: 7 days, fewer tickets
     Fixed --> Reopened: 7 days, not improved
-    Improved --> Resolved: no tickets for 7 days
+    Improved --> Resolved: no tickets since the mark
     Resolved --> Returned: 3 new tickets
-    Reopened --> New: new cause
-    Returned --> New: back to the user
+    Reopened --> Accepted: user accepts
+    Reopened --> Rejected: user rejects
+    Reopened --> Fixed: user marks Fixed
+    Returned --> Accepted: user accepts
+    Returned --> Rejected: user rejects
+    Returned --> Fixed: user marks Fixed
     Rejected --> New: only with new evidence
 ```
 
-Reopened and Returned send the finding back to **New**: the user decides again, and can accept it, reject it or mark it Fixed.
+Reopened and Returned keep their status and stay in every report until the user marks the finding again: Accepted, Rejected or Fixed. The status changes only when a mark is newer than the row's `last_seen`. **New** comes back only for a Rejected finding with new evidence.
 
 ## Where each kind of information lives
 
@@ -158,7 +162,7 @@ Tickets and the report are in Hebrew. The rubric repeats the checks in "Done mea
 |---|---|
 | Airtable cannot be read | The run says so and publishes nothing |
 | A write fails halfway | The next run repeats it safely, by `issue_key` |
-| The budget is reached | The run pauses. No partial report is published, because publishing is the last step |
+| The budget is reached | The run pauses. Publishing is the last step, so a pause before it publishes nothing. A pause in the middle of publishing can leave some rows updated: the next run repeats the writes by `issue_key` |
 | The run did not start | The deployment's run record shows the error |
 | Make's check fails | The email is sent anyway |
 | Make is down | The ticket is not saved. Accepted for the assignment; a real company needs an alert on the scenario |
