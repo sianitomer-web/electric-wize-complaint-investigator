@@ -28,12 +28,14 @@ The settings of the agent as they are set in the Claude Console. This file is th
 
 ## Vault
 
-`electric-wize-airtable`, with two environment-variable credentials. Both are limited to the host `api.airtable.com` and substituted in request headers only.
+`electric-wize-airtable` (its display name in the Console is still `Airtable ops read-only`), with two environment-variable credentials. Both are limited to the host `api.airtable.com` and substituted in request headers only.
 
 | Variable | Airtable token | Reaches |
 |---|---|---|
 | `AIRTABLE_OPS_READ` | `data.records:read` | Electric Wize - Operations, read only |
 | `AIRTABLE_FINDINGS_WRITE` | `data.records:read` and `data.records:write` | Electric Wize - Findings |
+
+Each token's access list in Airtable must show one base only. On 2026-11-25 the read token also had "All current and future bases", and the permission check caught it.
 
 The token values are never in this repository.
 
@@ -43,6 +45,6 @@ The token values are never in this repository.
 
 ## Order of the first runs
 
-1. Permission check, with message 1 in [test-messages.md](test-messages.md).
+1. Permission check, with message 1 in [test-messages.md](test-messages.md), in a plain test agent on the same vault.
 2. A first full run, with message 2. Read the transcript line by line.
 3. The ten planted cases, as described in SPEC.md, each run recorded in `runs/`.

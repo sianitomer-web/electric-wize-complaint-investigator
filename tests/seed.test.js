@@ -84,6 +84,26 @@ test('C2: 4 tickets, 4 cities, charge_count 2, mixed station models, after the b
   }
 });
 
+test('C2: double charges are at least 3 times as frequent after the billing update, whatever day the run is', () => {
+  const billing = Date.parse(change('billing', 'All stations').at);
+  for (const daysLater of [0, 1, 2, 4]) {
+    const start = NOW + daysLater * DAY - 14 * DAY;
+    const inWindow = data.sessions.filter((s) => Date.parse(s.started_at) >= start);
+    const rate = (list) => list.filter((s) => s.charge_count > 1).length / list.length;
+    const after = rate(inWindow.filter((s) => Date.parse(s.started_at) >= billing));
+    const before = rate(inWindow.filter((s) => Date.parse(s.started_at) < billing));
+    assert.ok(after > 0 && after >= 3 * before, `day +${daysLater}: after ${after}, before ${before}`);
+  }
+});
+
+test('C1: K50 stays at 40% of the sessions or less, whatever day the run is', () => {
+  for (const daysLater of [0, 1, 2, 4]) {
+    const inWindow = data.sessions.filter((s) => Date.parse(s.started_at) >= NOW + daysLater * DAY - 14 * DAY);
+    const share = inWindow.filter((s) => stationById.get(s.station_id).model === 'K50').length / inWindow.length;
+    assert.ok(share <= 0.4, `day +${daysLater}: ${share.toFixed(3)}`);
+  }
+});
+
 test('C3: three tickets at one K22 station with three different reasons, one at an H11 station elsewhere, no fitting change', () => {
   const tickets = ticketsOf(key.C3);
   assert.equal(tickets.length, 4);

@@ -2,6 +2,8 @@
 
 ## Message 1: permission check
 
+Run it in a plain test agent with no rules (`smoke-test-agent`), on the same vault. The investigator itself refuses tests 2, 3 and 6, because its instructions forbid them. That is the first layer working, but it says nothing about the keys.
+
 ```
 Permission check. Do not investigate anything. Run these tests with bash and report the HTTP status of each. Do not retry and do not work around a failure.
 
@@ -30,8 +32,10 @@ After the test, delete the "permission test" row from Runs, so that Runs is empt
 
 ## Message 2: a full run
 
+Every test run starts from the same state: seeded Findings, empty Runs, empty memory store. Runs that are compared with each other use the same `as_of`, because the seeded data belongs to 2026-11-25.
+
 ```
-Run today's investigation.
+Run the investigation. as_of: 2026-11-25T16:00:00+02:00. Model: claude-haiku-5-5.
 ```
 
-To run on another day, add the day: `Run the investigation. as_of: 2026-12-03T06:30:00+02:00`
+Change the model name to the one the session runs on. In daily use the message is `Run today's investigation. Model: <name>.`, with no `as_of`.
