@@ -166,6 +166,6 @@ Tickets and the report are in Hebrew. The rubric repeats the checks in "Done mea
 
 ## Cost
 
-- **Agent:** tokens plus $0.08 for each hour a session is running. Waiting is not charged. Budget: $2 per run. The real cost of each test run is added here after the build.
+- **Agent:** tokens plus $0.08 for each hour a session is running. Waiting is not charged. Budget: $2 per run. The first full run cost $0.07 (Haiku 5.5, effort high, 2026-11-25). Every run is recorded in `runs/`.
 - **Airtable:** about 10 read calls and a few writes per run, within the free plan's 1,000 a month.
 - **Make:** the cost per ticket is measured when the scenario is built.
