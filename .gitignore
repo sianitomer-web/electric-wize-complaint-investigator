@@ -3,3 +3,4 @@
 *.key
 *-config.js
 .DS_Store
+seed/out/
