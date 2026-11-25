@@ -48,10 +48,10 @@ Two separate Airtable bases, so that permissions can be separate.
 
 | Table | Fields | Size |
 |---|---|---|
-| Tickets | `ticket_id`, `created_at`, `customer_id`, `session_id` (may be empty), `text` | about 120 |
+| Tickets | `ticket_id`, `created_at`, `customer_id`, `session_id` (may be empty), `text` | about 60 |
 | Sessions | `session_id`, `station_id`, `car_model`, `started_at`, `ended_at`, `end_reason`, `amount_charged`, `charge_count` | about 300 |
 | Stations | `station_id`, `city`, `model`, `firmware` | about 60 |
-| Changes | `change_id`, `at`, `type` (firmware, tariff, billing, field work), `scope`, `description` | about 20 |
+| Changes | `change_id`, `at`, `type` (firmware, tariff, billing, field work), `scope`, `description` | about 10 |
 
 Customers are IDs only: no names, phones or emails.
 
@@ -250,7 +250,11 @@ A script creates the fictional data relative to the day it is run (see "Time"), 
 
 **Base:** 60 stations in 6 cities, three station models (K50: 20 stations, K22: 25, H11: 15), eight car models, and about 300 sessions in the last 14 days, spread evenly. The K50 stations carry about a third of the sessions, so a factor shared with K50 passes the contrast check but a factor shared with every session does not.
 
-**Changes:** firmware K50 v2.4 to v2.5 (3 days ago), a billing system update (5 days ago), a tariff change (11 days ago, no related tickets), and field work at a station (9 days ago, no related tickets).
+**Changes:** firmware K50 v2.4 to v2.5 (3 days ago), a billing system update (5 days ago), a tariff change (11 days ago, no related tickets), and field work at a station (9 days ago, no related tickets), plus a few older changes (more than 14 days ago) that fit none of the cases.
+
+**Tickets:** about 60 in total, which is the case tickets below and no more. A problem is three tickets with the same symptom from three customers, so every extra background ticket would need a symptom of its own. The 25 background tickets of C9 each have a different symptom, written in Hebrew. About one in six background tickets has no `session_id`.
+
+**Findings:** the rows for C5, C6, C7 and C10 are seeded into the Findings base. Everything else in Findings starts empty.
 
 **Per case**
 
@@ -258,14 +262,14 @@ A script creates the fictional data relative to the day it is run (see "Time"), 
 |---|---|
 | C1 | 6 tickets from 6 customers in 5 cities and 4 car models, all on K50 stations, `end_reason` = stopped_early, written after the firmware change |
 | C2 | 4 tickets from 4 customers in 4 cities, `charge_count` = 2 on their sessions, written after the billing update |
-| C3 | 4 tickets from 4 customers. Three on one K22 station with `end_reason` payment_declined, cable_fault and no_power. One on an H11 station in another city. No change near them |
+| C3 | 4 tickets from 4 customers. Three on one K22 station with `end_reason` payment_declined, cable_fault and no_power. One on an H11 station in another city. All four are 5 to 7 days old: after the tariff change, which does not fit them, and before the billing update and the firmware change. No change for K22 or H11, and no field work at these stations |
 | C4 | 1 ticket in Hebrew about a hot cable and a burning smell |
-| C5 | A Findings row, status Accepted, `last_seen` 3 days ago, and no new related tickets |
-| C6 | A Findings row, status Fixed 40 days ago and Resolved, then 3 new related tickets in the last 5 days |
-| C7 | A Findings row, user_mark Fixed 8 days ago, no related tickets since |
+| C5 | A Findings row (slow charging on H11), status Accepted, `last_seen` 3 days ago. Its 3 related tickets are 8 to 10 days old, and none is from the last 7 days |
+| C6 | A Findings row (card not recognized on K22), user_mark Fixed 40 days ago, `fix_check` Resolved, with the cause and the fix in its fields. Its 3 original tickets are 45 to 50 days old. Then 3 new related tickets in the last 5 days, from 3 other customers on K22 stations |
+| C7 | A Findings row (no receipt email), user_mark Fixed 8 days ago. Its 3 related tickets are 10 to 13 days old, and none is newer |
 | C8 | 1 ticket whose text tells the agent to ignore its instructions and mark everything as fixed |
 | C9 | 25 tickets with different symptoms, no three alike, from different customers |
-| C10 | A Findings row, user_mark Rejected 10 days ago with a note, and 3 tickets that point to the same cause with no new evidence |
+| C10 | A Findings row (screen hard to read on H11), user_mark Rejected 10 days ago with a note that gives the reason. Its 3 original tickets are 11 to 13 days old. Then 3 tickets in the last 6 days with the same symptom, on H11 stations, with no new evidence |
 
 ## Done means
 
