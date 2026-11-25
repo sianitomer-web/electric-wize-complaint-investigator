@@ -60,4 +60,4 @@ Same instructions, effort and data in both runs. The instructions had a sentence
 | Cost per run | $0.05 to $0.06 | $0.34 |
 | A month, one run a day | about $1.8 | about $10 |
 
-**Provisional: `claude-haiku-5-5`.** It does no worse than Sonnet at about a sixth of the cost. The choice is final only after two clean runs of each model, and after the email half of C4 is built.
+**Production: `claude-haiku-5-5`.** It passed two clean runs (5 and 6) at $0.05 each, so it is the cheapest model that passes, and Sonnet is tried only if Haiku fails. Sonnet ran once (run 4), before the instructions were corrected, so there is no clean Sonnet run to compare with. Still open: the email half of C4 (Make is not built).
