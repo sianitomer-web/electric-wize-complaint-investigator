@@ -5,49 +5,27 @@ What each part does and why: [SPEC.md](SPEC.md). This file shows where informati
 ## The whole system
 
 ```mermaid
-flowchart LR
-    subgraph IN["Sources"]
-        T["Customer ticket"]
-        S["Charging sessions<br/>and stations"]
-        C["Change log"]
-    end
+flowchart TB
+    U["Head of Customer Operations"]
+    TEAM["Maintenance, Software, Billing"]
 
-    subgraph MAKE["Make - fixed steps"]
-        W["Webhook"] --> SAVE["Save ticket"]
-        SAVE --> Q{"Safety or<br/>privacy?"}
-    end
+    T["Customer ticket"] --> W["Make: webhook,<br/>save ticket,<br/>safety or privacy check"]
+    W -- "urgent or unsure" --> MAIL["Urgent email"]
+    MAIL --> U
 
-    subgraph OPS["Airtable: Operations<br/>agent reads only"]
-        DB[("Tickets, Sessions,<br/>Stations, Changes")]
-    end
+    S["Sessions, stations, changes<br/>(seed script)"] --> OPS
+    W -- "saves ticket" --> OPS[("Airtable: Operations<br/>agent reads only")]
 
-    subgraph AG["Claude Managed Agents"]
-        D["Deployment<br/>every day 06:30"] --> A["Agent session"]
-        M[("Memory store<br/>charging-ops-notes")]
-        V["Vault: two keys"]
-        A <--> M
-        V -.-> A
-    end
+    D["Deployment<br/>every day 06:30"] --> A["Agent session"]
+    M[("Memory store")] <--> A
+    V["Vault: two keys"] -.-> A
+    OPS -- "read" --> A
 
-    subgraph FIND["Airtable: Findings<br/>agent writes"]
-        F[("Findings, Runs")]
-        UI["Interface:<br/>morning report"]
-        F <--> UI
-    end
-
-    U["Head of Customer<br/>Operations"]
-    TEAM["Maintenance,<br/>Software, Billing"]
-
-    T --> W
-    SAVE --> DB
-    S --> DB
-    C --> DB
-    Q -- "yes or unsure" --> MAIL["Urgent email"] --> U
-    DB -- "read" --> A
-    A -- "findings" --> F
-    F -- "user marks" --> A
+    A -- "findings" --> F[("Airtable: Findings<br/>agent writes")]
+    F --> UI["Interface: morning report"]
     UI --> U
-    U -- "Accepted, Rejected, Fixed" --> UI
+    U -- "Accepted, Rejected, Fixed" --> F
+    F -- "user marks,<br/>read in next run" --> A
     U --> TEAM
 ```
 
@@ -116,19 +94,17 @@ stateDiagram-v2
     New --> Rejected: user rejects
     New --> Fixed: user marks Fixed
     Accepted --> Fixed: user marks Fixed
-    Fixed --> Resolved: 7 days, no related tickets
+    Fixed --> Resolved: 7 days, no tickets
     Fixed --> Improved: 7 days, fewer tickets
     Fixed --> Reopened: 7 days, not improved
     Improved --> Resolved: no tickets for 7 days
-    Reopened --> Accepted: user accepts the new cause
-    Reopened --> Rejected: user rejects the new cause
-    Reopened --> Fixed: user marks Fixed
-    Resolved --> Returned: 3 new related tickets
-    Returned --> Accepted: user accepts
-    Returned --> Rejected: user rejects
-    Returned --> Fixed: user marks Fixed
+    Resolved --> Returned: 3 new tickets
+    Reopened --> New: new cause
+    Returned --> New: back to the user
     Rejected --> New: only with new evidence
 ```
+
+Reopened and Returned send the finding back to **New**: the user decides again, and can accept it, reject it or mark it Fixed.
 
 ## Where each kind of information lives
 
