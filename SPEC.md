@@ -78,7 +78,7 @@ The user fills only the `user_` fields. The agent reads them and never writes th
 - **Urgent:** one ticket about safety (heat, smoke, burning smell, shock, damaged cable) or privacy (someone sees another customer's data). One is enough.
 - **Known issue:** a row in Findings whose `first_seen` is on an earlier day. A row first written today is still today's problem, so a second run on the same day shows it again.
 - **`issue_key`:** symptom plus shared factor, for example `stops-early__model-K50`. With no shared factor: `no-shared-factor`, for example `does-not-start__no-shared-factor`. Before making a key, the agent looks for a row that describes the same problem and reuses its key. A key never changes once it exists.
-- **`first_seen` and `last_seen`:** the time of the first and of the latest run that handled the finding. They are run times, not ticket times. `last_seen` is updated in every run, for every row, shown or not. Ticket times belong in the evidence.
+- **`first_seen` and `last_seen`:** the time of the first and of the latest run that handled the finding. They are run times, not ticket times. In a test run with an `as_of` time, the agent used that time. `last_seen` is updated in every run, for every row, shown or not. Ticket times belong in the evidence.
 
 ## Confidence
 
