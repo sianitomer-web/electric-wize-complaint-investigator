@@ -48,3 +48,15 @@ The token values are never in this repository.
 1. Permission check, with message 1 in [test-messages.md](test-messages.md), in a plain test agent on the same vault.
 2. A first full run, with message 2. Read the transcript line by line.
 3. The ten planted cases, as described in SPEC.md, each run recorded in `runs/`.
+
+## Model choice
+
+The model is the only thing that changed between the two comparison runs (effort high in both). Details in `runs/`.
+
+| | `claude-haiku-5-5` | `claude-sonnet-5-5` |
+|---|---|---|
+| Planted cases passed | 10 of 10, in two runs | 10 of 10, in one run |
+| Cost per run | $0.06 | $0.34 |
+| A month, one run a day | about $1.8 | about $10 |
+
+**Production: `claude-haiku-5-5`.** It passes every case at a sixth of the cost. Sonnet is the fallback if a real case fails on Haiku. Sonnet ran once, so the comparison rests on one run.
