@@ -9,12 +9,12 @@ flowchart TB
     U["Head of Customer Operations"]
     TEAM["Maintenance, Software, Billing"]
 
-    T["Customer ticket"] --> W["Make: webhook,<br/>save ticket,<br/>safety or privacy check"]
+    T["Customer ticket"] --> W["Make: webhook,<br/>secret check,<br/>safety or privacy check"]
+    T -- "saved by the ticket system<br/>(the seed script, here)" --> OPS
     W -- "urgent or unsure" --> MAIL["Urgent email"]
     MAIL --> U
 
-    S["Sessions, stations, changes<br/>(seed script)"] --> OPS
-    W -- "saves ticket" --> OPS[("Airtable: Operations<br/>agent reads only")]
+    S["Sessions, stations, changes<br/>(seed script)"] --> OPS[("Airtable: Operations<br/>agent reads only")]
 
     D["Deployment<br/>every day 06:30"] --> A["Agent session"]
     M[("Memory store")] <--> A
@@ -35,7 +35,7 @@ In the assignment, the sessions, stations and changes are loaded by a seed scrip
 
 | Trigger | What runs | Output |
 |---|---|---|
-| A customer ticket arrives | Make scenario (webhook) | A row in Tickets. An email if urgent |
+| A customer ticket arrives | Make scenario (webhook) | An email if urgent. The ticket itself is saved by the ticket system |
 | Every day, 06:30 Asia/Jerusalem | The agent (deployment) | Findings, a row in Runs, the report, memory notes |
 | The user marks a finding | Nothing at once. The agent reads the mark in its next run | Fix check, or a lesson from a rejection |
 | A person presses Run | The agent, by hand | The same as the daily run, for tests |
@@ -44,13 +44,12 @@ In the assignment, the sessions, stations and changes are loaded by a seed scrip
 
 ```mermaid
 flowchart TD
-    T["New ticket"] --> S["Make: save to Tickets"]
-    S --> Q{"Safety or privacy?<br/>one question, small model"}
+    T["New ticket"] --> S["Saved by the ticket system<br/>(the seed script, here)"]
+    T --> Q{"Make: safety or privacy?<br/>one question, small model"}
     Q -- "yes" --> E["Email now"]
     Q -- "unsure or error" --> E
     Q -- "no" --> N["No email"]
-    E --> A["Next morning:<br/>the agent reads all tickets"]
-    N --> A
+    S --> A["Next morning:<br/>the agent reads all tickets"]
     A --> I{"Three or more related<br/>tickets, or urgent?"}
     I -- "yes" --> R["Investigate and report"]
     I -- "no" --> W["Not reported"]
@@ -114,7 +113,7 @@ Reopened and Returned keep their status and stay in every report until the user 
 
 | Information | Its one home | Who writes | Who reads |
 |---|---|---|---|
-| Tickets | Operations | Make | Agent |
+| Tickets | Operations | The ticket system (the seed script in the assignment) | Agent |
 | Sessions, stations, changes | Operations | Seed script (a real company: the charging platform) | Agent |
 | Findings and their status | Findings | Agent | User, agent |
 | User marks | Findings, `user_` fields | User | Agent |
@@ -151,6 +150,7 @@ flowchart LR
 | Environment | `electric-wize-closed`: cloud, limited network, allowed host `api.airtable.com`, no package installs |
 | Vault | `electric-wize-airtable`: `AIRTABLE_OPS_READ`, `AIRTABLE_FINDINGS_WRITE`. Environment variables, header only, allowed host `api.airtable.com` |
 | Memory store | `charging-ops-notes`, read and write |
+| Make | Scenario `Electric Wize - urgent ticket fast track`: webhook, secret check on the header `x-ticket-secret`, one question to Make's AI, an email through a Gmail connection that has only the send and read permissions, on a demo account. A wrong secret gets a 403. Details and proof in `make/fast-track.md` |
 | Session | Started by hand first, read line by line |
 | Deployment | `electric-wize-every-morning`, 06:30 Asia/Jerusalem, pinned version, $2 budget, outcome with a rubric, at most 3 revisions |
 
@@ -165,11 +165,11 @@ Tickets and the report are in Hebrew. The rubric repeats the checks in "Done mea
 | The budget is reached | The run pauses. Publishing is the last step, so a pause before it publishes nothing. A pause in the middle of publishing can leave some rows updated: the next run repeats the writes by `issue_key` |
 | The run did not start | The deployment's run record shows the error |
 | Make's check fails | The email is sent anyway |
-| Make is down | The ticket is not saved. Accepted for the assignment; a real company needs an alert on the scenario |
+| Make is down | No urgent email is sent. The ticket is still saved, and the agent reads it the next morning. A real company needs an alert on the scenario |
 | Memory is wrong | Conclusions are checked against Airtable. The note is rolled back |
 
 ## Cost
 
 - **Agent:** tokens plus $0.08 for each hour a session is running. Waiting is not charged. Budget: $2 per run. The first full run cost $0.07 (Haiku 5.5, effort high, 2026-11-25). Every run is recorded in `runs/`.
 - **Airtable:** about 10 read calls and a few writes per run, within the free plan's 1,000 a month.
-- **Make:** the cost per ticket is measured when the scenario is built.
+- **Make:** 3 operations for a normal ticket and 4 for an urgent one, measured on 2026-11-25. The free plan has 1,000 operations a month and 2 active scenarios.
