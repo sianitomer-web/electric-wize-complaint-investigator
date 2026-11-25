@@ -64,7 +64,9 @@ Customers are IDs only: no names, phones or emails.
 | Findings | `issue_key`, `title`, `status`, `affected_customers`, `ticket_ids`, `suspected_cause`, `evidence`, `ruled_out`, `confidence`, `route_to`, `first_seen`, `last_seen`, `fix_check`, **`user_mark`** (Accepted, Rejected, Fixed), **`user_mark_date`**, `user_note` |
 | Runs | `run_at`, `as_of`, `tickets_read`, `findings_reported`, `summary` |
 
-The user fills only the `user_` fields. The agent reads them and never writes them.
+The user fills only the `user_` fields. The agent reads them and never writes them. Airtable sets permissions for a whole base, not for a table or a field, so this rule is kept by the agent's instructions and checked by the planted cases. It is not enforced by the key.
+
+`status`, `confidence`, `route_to`, `fix_check` and `user_mark` are single-select fields with fixed choices, so the agent cannot write a value that is not on the list and the user marks a finding with one click. Status: New, Accepted, Rejected, Fixed, Resolved, Improved, Reopened, Returned. Confidence: High, Medium. Route to: Station Maintenance, Software, Billing. Fix check: Too early, Resolved, Improved, Not improved. User mark: Accepted, Rejected, Fixed.
 
 **Time.** "Now" is the container's clock in Asia/Jerusalem, read once at the start of a run. A run may receive an `as_of` value in its first message, and then that value is "now" instead. No date is written into the instructions or the skill. The seed script creates the fictional data relative to the day it is run, so the data does not go stale.
 
