@@ -56,8 +56,8 @@ Same instructions, effort and data in both runs. The instructions had a sentence
 | | `claude-haiku-5-5` | `claude-sonnet-5-5` |
 |---|---|---|
 | Planted cases | 8 pass, C3 partial, C4 report half only | 8 pass, C3 fail, C4 report half only |
-| Clean runs with the corrected instructions (2 required) | 1 (run 5), cases: 9 pass, C4 report half only | 0 |
-| Cost per run | $0.06 | $0.34 |
+| Clean runs with the corrected instructions (2 required) | 2 (runs 5 and 6): C1-C3 and C5-C10 pass in both, C4 report half only. The urgent ticket was rated differently in the two | 0 |
+| Cost per run | $0.05 to $0.06 | $0.34 |
 | A month, one run a day | about $1.8 | about $10 |
 
-**Provisional: `claude-haiku-5-5`.** It does no worse than Sonnet at about a sixth of the cost. The choice is final only after two clean runs of each model, and after the email half of C4 is built.
+**Production: `claude-haiku-5-5`.** It passed two clean runs (5 and 6) at $0.05 each, so it is the cheapest model that passes, and Sonnet is tried only if Haiku fails. Sonnet ran once (run 4), before the instructions were corrected, so there is no clean Sonnet run to compare with. Still open: the email half of C4 (Make is not built).

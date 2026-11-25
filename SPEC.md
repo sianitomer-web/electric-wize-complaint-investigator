@@ -32,13 +32,13 @@ A charging network gets dozens of complaints a day. Each one is answered on its 
 
 | Part | In this agent |
 |---|---|
-| Model | Built and debugged on `claude-haiku-5-5`; final comparison on `claude-sonnet-5-5`. Production model = the cheapest one that passes every planted case. Effort `high` |
+| Model | Built, debugged and run on `claude-haiku-5-5`. `claude-sonnet-5-5` is tried only if Haiku fails a case because of its reasoning. Production model = the cheapest one that passes every planted case. Effort `high` |
 | Tools | `bash`, `read`, `write`, `edit`, `grep`, `glob` in a closed container. Web tools off. No skill: the few Airtable calls it needs are written in its instructions, because a skill has to be uploaded through the API and cannot be added in the Console |
 | Memory | One memory store, `charging-ops-notes`, read and write |
 | Goal | The instructions below: role, steps, rules, finish line |
 | Loop | Claude Managed Agents, with a budget and a limit on revisions |
 
-Effort `high` because a wrong cause sends a team to fix the wrong thing. The build and debugging run on the cheaper Haiku, because most early failures are mistakes in the instructions or the seed data, and those should not cost Sonnet prices. When the instructions are stable, all ten planted cases run on Haiku and on Sonnet, each at least twice, because one lucky pass proves nothing. The results and the real cost of each run are recorded in the repository. The cheapest model that passes every case is the production model. If a case fails on Haiku because of the model's reasoning, and not because of the instructions or the data, the choice moves to Sonnet (and to `claude-opus-5-5` if Sonnet fails the same way).
+Effort `high` because a wrong cause sends a team to fix the wrong thing. The build and debugging run on the cheaper Haiku, because most early failures are mistakes in the instructions or the seed data, and those should not cost Sonnet prices. When the instructions are stable, all ten planted cases run on Haiku at least twice, each time from a clean start, because one lucky pass proves nothing. Sonnet is run only if Haiku fails: if Haiku passes, it is the cheapest model that passes, and a Sonnet run cannot change the choice (decided 2026-11-25, after Sonnet ran once with instructions that were later corrected). The results and the real cost of each run are recorded in the repository. The cheapest model that passes every case is the production model. If a case fails on Haiku because of the model's reasoning, and not because of the instructions or the data, the choice moves to Sonnet (and to `claude-opus-5-5` if Sonnet fails the same way).
 
 ## Data
 
