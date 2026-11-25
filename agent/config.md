@@ -51,11 +51,11 @@ The token values are never in this repository.
 
 ## Model choice
 
-Same instructions, effort and data in both runs. One difference besides the model: Haiku's memory store held notes from run 1, and Sonnet's was empty. Details in `runs/`.
+Same instructions, effort and data in both runs. The instructions had a sentence that contradicted the spec on case C3 (repaired in the pull request after this table); the comparison on C3 therefore says little about the models. One difference besides the model: Haiku's memory store held notes from run 1, and Sonnet's was empty. Details in `runs/`.
 
 | | `claude-haiku-5-5` | `claude-sonnet-5-5` |
 |---|---|---|
-| Planted cases | 9 pass, C4 report half only | 8 pass, C3 partial, C4 report half only |
+| Planted cases | 8 pass, C3 partial, C4 report half only | 8 pass, C3 fail, C4 report half only |
 | Clean runs with these instructions (2 required) | 0 | 1 |
 | Cost per run | $0.06 | $0.34 |
 | A month, one run a day | about $1.8 | about $10 |
