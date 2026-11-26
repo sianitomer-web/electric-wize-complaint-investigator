@@ -7,7 +7,7 @@ The settings of the agent as they are set in the Claude Console. This file is th
 | Setting | Value |
 |---|---|
 | Name | `electric-wize-investigator` |
-| Model | `claude-haiku-5-5` while building. The final choice is the cheapest model that passes every planted case (see SPEC.md) |
+| Model | `claude-haiku-5-5`. Chosen as the cheapest model that passes the planted cases (see "Model choice" below) |
 | Effort | High |
 | System prompt | The full text of [instructions.md](instructions.md), pasted as it is |
 | Tools | `bash`, `read`, `write`, `edit`, `grep`, `glob` on Auto. `web_fetch` and `web_search` denied |
@@ -51,13 +51,13 @@ The token values are never in this repository.
 
 ## Model choice
 
-Same instructions, effort and data in both runs. The instructions had a sentence that contradicted the spec on case C3 (repaired in the pull request after this table); the comparison on C3 therefore says little about the models. One difference besides the model: Haiku's memory store held notes from run 1, and Sonnet's was empty. Details in `runs/`.
+Effort and data were the same for both models. The first comparison (run 2 against run 4) used instructions with a sentence that contradicted the spec on case C3, so it says little about C3. Haiku then ran twice more with the corrected instructions (runs 5 and 6). Sonnet did not. Details in `runs/`.
 
 | | `claude-haiku-5-5` | `claude-sonnet-5-5` |
 |---|---|---|
-| Planted cases | 8 pass, C3 partial, C4 report half only | 8 pass, C3 fail, C4 report half only |
+| Planted cases, first comparison (runs 2 and 4) | 8 pass, C3 partial, C4 report half only | 8 pass, C3 fail, C4 report half only |
 | Clean runs with the corrected instructions (2 required) | 2 (runs 5 and 6): C1-C3 and C5-C10 pass in both, C4 report half only. The urgent ticket was rated differently in the two | 0 |
 | Cost per run | $0.05 to $0.06 | $0.34 |
 | A month, one run a day | about $1.8 | about $10 |
 
-**Production: `claude-haiku-5-5`.** It passed two clean runs (5 and 6) at $0.05 each, so it is the cheapest model that passes, and Sonnet is tried only if Haiku fails. Sonnet ran once (run 4), before the instructions were corrected, so there is no clean Sonnet run to compare with. Still open: the email half of C4 (Make is not built).
+**Production: `claude-haiku-5-5`.** It passed two clean runs (5 and 6) at $0.05 each, so it is the cheapest model that passes, and Sonnet is tried only if Haiku fails. Sonnet ran once (run 4), before the instructions were corrected, so there is no clean Sonnet run to compare with. The email half of C4 was built and tested after these runs, outside the agent: see [../make/fast-track.md](../make/fast-track.md).
