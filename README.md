@@ -12,9 +12,9 @@ Electric Wize is a fictional company. All customers, stations and tickets are in
 
 ## Status
 
-Built: the seed script (fictional data in Airtable), the agent in the Claude Console (instructions, environment, vault, memory store) and four recorded runs (`runs/`). The permissions model (vault, limited network, read-only key) was checked in a smoke test and on the real bases on 2026-11-25. The model choice is provisional (`agent/config.md`).
+Built: the seed script (fictional data in Airtable), the agent in the Claude Console (instructions, environment, vault, memory store), six recorded runs (`runs/`) and the Make fast track for urgent tickets (`make/fast-track.md`). The production model is `claude-haiku-5-5` (`agent/config.md`). The permissions model (vault, limited network, read-only key) was checked in a smoke test and on the real bases on 2026-11-25.
 
-Not built yet: the Make fast track for urgent tickets (so the email half of case C4 is untested), the 06:30 scheduled deployment and the Airtable Interface. `SPEC.md` and `Architecture.md` describe the full design, including these three.
+Not built yet: the 06:30 scheduled deployment and the Airtable Interface. The agent is run by hand. `SPEC.md` and `Architecture.md` describe the full design, including these two.
 
 ## Platform
 

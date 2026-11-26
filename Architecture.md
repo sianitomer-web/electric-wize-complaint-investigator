@@ -146,7 +146,7 @@ flowchart LR
 
 | Screen | Setting |
 |---|---|
-| Agent | `electric-wize-investigator`, `claude-haiku-5-5` while building, then the cheapest model that passes all planted cases (see SPEC.md, "The agent, by its five parts"), effort `high`. `bash`, `read`, `write`, `edit`, `grep`, `glob` on and allowed. `web_search`, `web_fetch` off. No skill: the Airtable calls are in the instructions |
+| Agent | `electric-wize-investigator`, `claude-haiku-5-5`, the cheapest model that passes the planted cases (see `agent/config.md`), effort `high`. `bash`, `read`, `write`, `edit`, `grep`, `glob` on and allowed. `web_search`, `web_fetch` off. No skill: the Airtable calls are in the instructions |
 | Environment | `electric-wize-closed`: cloud, limited network, allowed host `api.airtable.com`, no package installs |
 | Vault | `electric-wize-airtable`: `AIRTABLE_OPS_READ`, `AIRTABLE_FINDINGS_WRITE`. Environment variables, header only, allowed host `api.airtable.com` |
 | Memory store | `charging-ops-notes`, read and write |
